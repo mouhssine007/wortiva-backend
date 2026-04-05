@@ -18,6 +18,10 @@ class StoryController extends Controller
             $query->where('level', $request->level);
         }
 
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+
         return response()->json($query->get());
     }
 

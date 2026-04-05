@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Story extends Model
 {
-    protected $fillable = [
-        'title', 'level', 'cover_image_url', 'audio_url',
-        'duration', 'chapter_count', 'word_count',
-        'is_premium', 'is_published', 'sort_order',
-    ];
-
+ protected $fillable = [
+    'title', 'level', 'type', 'cover_image_url', 'audio_url',
+    'duration', 'chapter_count', 'word_count',
+    'is_premium', 'is_published', 'sort_order',
+];
     protected $casts = [
         'is_premium' => 'boolean',
         'is_published' => 'boolean',

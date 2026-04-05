@@ -20,6 +20,10 @@ class StoryForm
                 Select::make('level')
                     ->options(['A1'=>'A1','A2'=>'A2','B1'=>'B1','B2'=>'B2','C1'=>'C1','C2'=>'C2'])
                     ->required(),
+                Select::make('type')
+                    ->options(['learn' => 'Learn (short + grammar)', 'listen' => 'Listen (podcast + audio)'])
+                    ->required()
+                    ->default('learn'),
                 FileUpload::make('cover_image_url')
                     ->disk('public')
                     ->directory('stories/covers')
