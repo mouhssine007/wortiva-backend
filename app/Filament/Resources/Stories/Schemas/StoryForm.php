@@ -43,7 +43,17 @@ class StoryForm
                     ->relationship()
                     ->schema([
                         TextInput::make('sort_order')->numeric()->required()->default(0),
-                        Textarea::make('german')->required()->rows(2),
+                        Textarea::make('german')
+                            ->required()
+                            ->rows(2)
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if (!$state) return;
+                                try {
+                                    $deepl = new \App\Services\DeeplService();
+                                    $set('english', $deepl->translate($state));
+                                } catch (\Exception $e) {}
+                            }),
                         Textarea::make('english')->required()->rows(2),
                         Toggle::make('is_dialogue')->default(false),
                     ])
@@ -54,7 +64,16 @@ class StoryForm
                 Repeater::make('keywords')
                     ->relationship()
                     ->schema([
-                        TextInput::make('word')->required(),
+                        TextInput::make('word')
+                            ->required()
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if (!$state) return;
+                                try {
+                                    $deepl = new \App\Services\DeeplService();
+                                    $set('translation', $deepl->translate($state));
+                                } catch (\Exception $e) {}
+                            }),
                         TextInput::make('translation')->required(),
                         Select::make('word_type')
                             ->options(['NOUN'=>'Noun','VERB'=>'Verb','ADJECTIVE'=>'Adjective','ADVERB'=>'Adverb'])
@@ -74,10 +93,48 @@ class StoryForm
                             ->options(['A1'=>'A1','A2'=>'A2','B1'=>'B1','B2'=>'B2','C1'=>'C1','C2'=>'C2'])
                             ->required(),
                         TextInput::make('category')->required(),
-                        TextInput::make('example_german')->required(),
+                        TextInput::make('example_german')
+                            ->required()
+                            ->live(debounce: 500)
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if (!$state) return;
+                                try {
+                                    $deepl = new \App\Services\DeeplService();
+                                    $set('example_english', $deepl->translate($state));
+                                } catch (\Exception $e) {}
+                            }),
                         TextInput::make('example_english')->required(),
-                        Textarea::make('description')->required()->rows(3),
+                        Textarea::make('description')
+                            ->required()
+                            ->rows(3),
                         Textarea::make('quick_tip')->rows(2),
+
+                        Repeater::make('explanation_blocks')
+                            ->schema([
+                                TextInput::make('subtitle_en')
+                                    ->label('Section title (e.g. Comparative, Superlative)'),
+                                Textarea::make('content_en')
+                                    ->label('Explanation (English)')
+                                    ->rows(3),
+                                TextInput::make('example_de')
+                                    ->label('Example German'),
+                                TextInput::make('example_en')
+                                    ->label('Example English')
+                                    ->live(debounce: 500)
+                                    ->afterStateUpdated(function ($state, $get, callable $set) {
+                                        if (!$state) return;
+                                        $de = $get('example_de');
+                                        if (!$state && $de) {
+                                            try {
+                                                $deepl = new \App\Services\DeeplService();
+                                                $set('example_en', $deepl->translate($de));
+                                            } catch (\Exception $e) {}
+                                        }
+                                    }),
+                            ])
+                            ->columnSpanFull()
+                            ->addActionLabel('Add Explanation Block')
+                            ->collapsible(),
                     ])
                     ->maxItems(1)
                     ->columnSpanFull()
