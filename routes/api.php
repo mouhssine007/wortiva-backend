@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\PracticeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('/stories', [StoryController::class, 'index']);
     Route::get('/stories/{story}', [StoryController::class, 'show']);
+    Route::get('/practice', [PracticeController::class, 'index']);
 });
 
 Route::post('/v1/translate', function (\Illuminate\Http\Request $request) {
